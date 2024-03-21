@@ -1,0 +1,5 @@
+*.zip
+*.egg-info
+dist
+__pycache__
+.coverage
