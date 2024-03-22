@@ -11,8 +11,9 @@ def connect(event, context):
     print(f'Event content {event}')
     print(f'Event context {context}')
     table = ddb.Table(os.getenv('TABLE_NAME'))
+    account = os.getenv('ACCOUNT_ID')
     table.put_item(Item={
-        'PK': f'DataConnections:{event["requestContext"]["accountId"]}',
+        'PK': f'DataConnections:{account}',
         'SK': event['requestContext']['connectionId'],
         'connectionId': event['requestContext']['connectionId'],
     })
@@ -25,8 +26,9 @@ def disconnect(event, context):
     print(f'Event content {event}')
     print(f'Event context {context}')
     table = ddb.Table(os.getenv('TABLE_NAME'))
+    account = os.getenv('ACCOUNT_ID')
     table.delete_item(Item={
-        'PK': f'DataConnections:{event["requestContext"]["accountId"]}',
+        'PK': f'DataConnections:{account}',
         'SK': event['requestContext']['connectionId'],
     })
     return {
@@ -53,10 +55,11 @@ def send_message(event, context):
     print(f'Event content {event}')
     print(f'Event context {context}')
     table = ddb.Table(os.getenv('TABLE_NAME'))
+    account = os.getenv('ACCOUNT_ID')
     management = boto3.client(
         'ApiGatewayManagementApi',
         endpoint=f'{event["requestContext"]["domainName"]}/{event["requestContext"]["stage"]}')
-    resp = table.query(KeyConditionExpression=Key("PK").eq(f'DataConnections:{event["requestContext"]["accountId"]}'))
+    resp = table.query(KeyConditionExpression=Key("PK").eq(f'DataConnections:{account}'))
     payload = json.loads(event['body'])
     for item in resp["Items"]:
         management.post_to_connection(
