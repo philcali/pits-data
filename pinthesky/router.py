@@ -40,7 +40,7 @@ def default(event, context):
     print(f'Event content {event}')
     print(f'Event context {context}')
     management = boto3.client(
-        'ApiGatewayManagementApi',
+        'apigatewaymanagementapi',
         endpoint_url=f'{event["requestContext"]["domainName"]}/{event["requestContext"]["stage"]}')
     management.post_to_connection(
         ConnectionId=event["requestContext"]["connectionId"],
@@ -57,7 +57,7 @@ def send_message(event, context):
     table = ddb.Table(os.getenv('TABLE_NAME'))
     account = os.getenv('ACCOUNT_ID')
     management = boto3.client(
-        'ApiGatewayManagementApi',
+        'apigatewaymanagementapi',
         endpoint_url=f'{event["requestContext"]["domainName"]}/{event["requestContext"]["stage"]}')
     resp = table.query(KeyConditionExpression=Key("PK").eq(f'DataConnections:{account}'))
     payload = json.loads(event['body'])
