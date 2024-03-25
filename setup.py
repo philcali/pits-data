@@ -29,7 +29,8 @@ setup(
         "Operating System :: OS Independent"
     ],
     install_requires=[
-        "boto3"
+        "boto3",
+        "pycryptodome"
     ],
     extra_require={
         'test': ['pytest']
