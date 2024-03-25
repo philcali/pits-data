@@ -24,7 +24,7 @@ def connect(connections):
 @api.routeKey('$disconnect')
 def disconnect(connections):
     account = request.account_id()
-    connections.delete(account, request.connection_id())
+    connections.delete(account, item_id=request.connection_id())
 
 
 @api.routeKey('$default')
@@ -49,7 +49,7 @@ def send_message(connections):
     while truncated:
         resp = connections.items(
             request.account_id(),
-            QueryParams(next_token=next_token))
+            params=QueryParams(next_token=next_token))
         for item in resp.items:
             management.post_to_connection(
                 ConnectionId=item['connectionId'],
