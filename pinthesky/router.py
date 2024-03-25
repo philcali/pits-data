@@ -126,7 +126,7 @@ class Router:
     def routeKey(self, routeKey):
         def wrapper(func):
             def filter_func(**kwargs):
-                if request.event['routeKey'] == routeKey:
+                if request.request_context('routeKey') == routeKey:
                     response.break_continuation()
                     func(**kwargs)
             self.filters.append(filter_func)
