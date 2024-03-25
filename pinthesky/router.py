@@ -1,6 +1,7 @@
 from contextvars import copy_context
 from decimal import Decimal
 import traceback
+from functools import partial
 from pinthesky.globals import request, response, app_context
 import inspect
 import json
@@ -29,7 +30,10 @@ class Router:
         self.__prepare_context(ctx, event, context)
         for filter in self.filters:
             kwargs = self.__fill_globals(filter)
-            output = ctx.run(filter, **kwargs)
+            if hasattr(filter, 'routeKey'):
+                output = self.__dispatch_route_key(ctx, filter, **kwargs)
+            else:
+                output = ctx.run(filter, **kwargs)
             if self.__is_aborted(ctx):
                 return self.__dispatch_response(ctx, output, aborted=True)
         for rule, route in self.routes.items():
@@ -47,6 +51,14 @@ class Router:
             'headers': {'content-type': 'application/json'},
             'body': '{"message": "Resource not found"}'
         }
+
+    def __dispatch_route_key(self, ctx, filter, **kwargs):
+        route_key = getattr(filter, 'routeKey')
+        def wrapper():
+            if request.request_context('routeKey') == route_key:
+                response.break_continuation()
+                filter(**kwargs)
+        return ctx.run(wrapper)
 
     def __dispatch_response(self, ctx, output, aborted=False):
         def format_output(real_out):
@@ -125,11 +137,9 @@ class Router:
 
     def routeKey(self, routeKey):
         def wrapper(func):
-            def filter_func(**kwargs):
-                if request.request_context('routeKey') == routeKey:
-                    response.break_continuation()
-                    func(**kwargs)
-            self.filters.append(filter_func)
+            setattr(func, 'routeKey', routeKey)
+            self.filters.append(func)
+            return func
         return wrapper
 
     def route(self, path, methods=["GET"]):
