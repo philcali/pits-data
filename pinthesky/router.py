@@ -122,7 +122,7 @@ class Router:
             response.headers = {}
             response.abort = False
             request.cookies = event['cookies'] if 'cookies' in event else {}
-            request.headers = event['headers']
+            request.headers = event.get('headers', {})
             request.queryparams = event[qparams] if qparams in event else {}
             request.body = event['body'] if 'body' in event else None
             request.event = event
