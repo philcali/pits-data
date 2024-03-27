@@ -31,7 +31,7 @@ def disconnect(connections):
 def default():
     management = boto3.client(
         'apigatewaymanagementapi',
-        endpoint_url=f'https://{request.request_context("domainName")}/{request.request_context("stage")}')
+        endpoint_url='https://data.pits.philcali.me')
     management.post_to_connection(
         ConnectionId=request.request_context('connectionId'),
         Data=f'Use the sendMessage route to send a message.'.encode(encoding='utf-8'),
@@ -42,7 +42,7 @@ def default():
 def send_message(connections):
     management = boto3.client(
         'apigatewaymanagementapi',
-        endpoint_url=f'https://{request.request_context("domainName")}/{request.request_context("stage")}')
+        endpoint_url='https://data.pits.philcali.me')
     payload = json.loads(request.body)
     truncated = True
     next_token = None
