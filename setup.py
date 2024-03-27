@@ -30,7 +30,7 @@ setup(
     ],
     install_requires=[
         "boto3",
-        "pycryptodome"
+        "ophis-py"
     ],
     extra_require={
         'test': ['pytest']

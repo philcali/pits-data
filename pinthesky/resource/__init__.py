@@ -1,10 +1,10 @@
-from boto3.dynamodb.conditions import Key
 import boto3
 import os
 import json
 from pinthesky import api
-from pinthesky.globals import app_context, request
-from pinthesky.database import DataConnections, QueryParams
+from pinthesky.database import DataConnections
+from ophis.globals import app_context, request
+from ophis.database import QueryParams
 
 ddb = boto3.resource('dynamodb')
 
