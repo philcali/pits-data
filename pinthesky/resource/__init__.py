@@ -18,13 +18,13 @@ def connect(connections):
     account = request.account_id()
     connections.create(
         account,
-        item={'connectionId': request.connection_id()})
+        item={'connectionId': request.request_context('connectionId')})
 
 
 @api.routeKey('$disconnect')
 def disconnect(connections):
     account = request.account_id()
-    connections.delete(account, item_id=request.connection_id())
+    connections.delete(account, item_id=request.request_context('connectionId'))
 
 
 @api.routeKey('$default')
@@ -33,7 +33,7 @@ def default():
         'apigatewaymanagementapi',
         endpoint_url=f'https://{request.request_context("domainName")}/{request.request_context("stage")}')
     management.post_to_connection(
-        ConnectionId=request.connection_id(),
+        ConnectionId=request.request_context('connectionId'),
         Data=f'Use the sendMessage route to send a message.'.encode(encoding='utf-8'),
     )
 
