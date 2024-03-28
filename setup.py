@@ -30,7 +30,8 @@ setup(
     ],
     install_requires=[
         "boto3",
-        "ophis-py"
+        "ophis-py",
+        "python-jose"
     ],
     extra_require={
         'test': ['pytest']
