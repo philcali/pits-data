@@ -17,7 +17,8 @@ class JWTAuthorizer:
         self.keys = keys
     
     def pull_known_keys(pool_id, region=None):
-        with urllib.request.urlopen(f'https://cognito-idp.{os.getenv('AWS_REGION', region)}.amazonaws.com/{pool_id}/.well-known/jwks.json') as r:
+        aws_region = os.getenv("AWS_REGION") if region is None else region
+        with urllib.request.urlopen(f'https://cognito-idp.{aws_region}.amazonaws.com/{pool_id}/.well-known/jwks.json') as r:
             response = r.read()
         payload = json.loads(response.decode('utf-8'))
         return payload['keys']
