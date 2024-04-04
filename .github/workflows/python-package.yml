@@ -32,7 +32,7 @@ jobs:
       run: |
         ./dev.pull-dynamodb.sh
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pytest-cov
+        python -m pip install flake8 pytest pytest-cov requests-mock
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python -m pip install -e .
     - name: Lint with flake8
