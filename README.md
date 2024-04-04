@@ -1,5 +1,9 @@
 # Pi In The Sky - Data
 
+[![CodeQL](https://github.com/philcali/pits-data/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/philcali/pits-data/actions/workflows/codeql-analysis.yml)
+[![Python package](https://github.com/philcali/pits-data/actions/workflows/python-package.yml/badge.svg)](https://github.com/philcali/pits-data/actions/workflows/python-package.yml)
+[![codecov](https://codecov.io/gh/philcali/pits-data/graph/badge.svg?token=7PLJAXA1GP)](https://codecov.io/gh/philcali/pits-data)
+
 The data plane API for the Pi In The Sky application
 
 ## Architecture

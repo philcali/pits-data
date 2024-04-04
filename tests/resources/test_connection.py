@@ -84,7 +84,7 @@ def test_connect_session(connections):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(routeKey="$connect", connectionId="abc-123" ,headers={
+        connections(routeKey="$connect", connectionId="abc-123", headers={
             'ManagerId': "$connectionId"
         })
 
@@ -95,7 +95,7 @@ def test_disconnect_session(connections):
 
     management = MagicMock()
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(routeKey="$disconnect", connectionId="abc-123" ,headers={
+        connections(routeKey="$disconnect", connectionId="abc-123", headers={
             'ManagerId': "$connectionId"
         })
 
