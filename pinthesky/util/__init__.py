@@ -1,6 +1,5 @@
 import boto3
 import json
-import inspect
 import logging
 import os
 from botocore.client import ClientError
