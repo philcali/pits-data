@@ -31,9 +31,13 @@ setup(
     install_requires=[
         "boto3",
         "ophis-py",
-        "python-jose"
+        "python-jose",
+        "requests",
     ],
     extra_require={
-        'test': ['pytest']
+        'test': [
+            'pytest',
+            'requests-mock'
+        ]
     }
 )
