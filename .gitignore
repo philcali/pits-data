@@ -1,5 +1,9 @@
 *.zip
 *.egg-info
+*.tar.gz
+dynamodb-local-metadata.json
+DynamoDBLocal*
+dynamodb/*.txt
 dist
 __pycache__
 .coverage

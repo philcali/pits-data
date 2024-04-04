@@ -1,0 +1,51 @@
+{
+  "version": "2.0",
+  "routeKey": "$routeKey",
+  "rawPath": "$path",
+  "rawQueryString": "",
+  "cookies": [
+  ],
+  "headers": {
+  },
+  "queryStringParameters": {
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "connectionId": "$connectionId",
+    "authorizer": {
+        "at_hash": "NsudZoCpcdD6HLqplFnpMg",
+        "sub": "98498077-4c1d-4ffb-ab3d-8532dce5db4d",
+        "email_verified": true,
+        "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_dHzUCxsYs",
+        "cognito:username": "philcali",
+        "aud": "27pk3aoia2l347oq7si0v8j3mb",
+        "event_id": "f2c58f6d-3bc5-45ed-8a04-885d7f685f66",
+        "token_use": "id",
+        "auth_time": 1711661312,
+        "exp": 1711747712,
+        "iat": 1711661312,
+        "jti": "3924597a-67f1-4062-b519-e9bcfc4b8e6b",
+        "email": "philip.cali@gmail.com"
+    },
+    "domainName": "id.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "id",
+    "http": {
+      "method": "$method",
+      "path": "$path",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "IP",
+      "userAgent": "agent"
+    },
+    "requestId": "id",
+    "routeKey": "$routeKey",
+    "stage": "$routeKey",
+    "time": "12/Mar/2020:19:03:58 +0000",
+    "timeEpoch": 1583348638390
+  },
+  "pathParameters": {
+  },
+  "body": $body,
+  "isBase64Encoded": false,
+  "stageVariables": {
+  }
+}
