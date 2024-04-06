@@ -44,6 +44,7 @@ class ManagementWrapper:
                 'name': event['name'],
                 'context': {
                     **event.get('context', {}),
+                    **event.get('session', {}),
                     'connection': {
                         'id': request.request_context('connectionId'),
                         'invoke_id': session_id

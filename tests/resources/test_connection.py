@@ -34,7 +34,10 @@ def test_default(connections):
                     'message': 'Resource not found',
                 },
                 'body': {
-                    'actions': ['invoke']
+                    'availableActions': [
+                        'invoke',
+                        'listSessions',
+                    ]
                 },
             }
         })

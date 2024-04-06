@@ -17,8 +17,9 @@ def default():
             'message': 'Resource not found',
         },
         'body': {
-            'actions': [
+            'availableActions': [
                 'invoke',
+                'listSessions',
             ]
         },
     }

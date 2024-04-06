@@ -18,6 +18,7 @@ def connect(connections):
         item={
             'connectionId': connection_id,
             'managerId': manager_id,
+            'manager': manager_id is None,
         })
     print(manager_id)
     if manager_id is None:
