@@ -1,12 +1,15 @@
 import boto3
 import json
+import logging
 import os
+from ophis.database import QueryParams, MAX_ITEMS
 from ophis.globals import app_context, request
 from pinthesky import api, management
 from pinthesky.database import DataSessions
 from uuid import uuid4
 
 
+logger = logging.getLogger(__name__)
 DATA_ENDPOINT = f'https://{os.getenv("DATA_ENDPOINT")}'
 
 
@@ -82,5 +85,60 @@ def invoke(iot_data, sessions):
         )
 
     payload['body'] = {'invokeId': invoke_id}
+
+    return post_to_connection()
+
+
+@api.routeKey("listSessions")
+def list_sessions(connections, sessions):
+    payload = {'statusCode': 200}
+
+    @management.post()
+    def post_to_connection():
+        return payload
+
+    connection_id = request.request_context('connectionId')
+    input = {'connectionId': connection_id} if request.body == "" else json.loads(request.body)
+    connection = connections.get(
+        request.account_id(),
+        item_id=input.get('connectionId', connection_id)
+    )
+    # We'll allow a connection to list its own sessions or managed sessions
+    if connection is None or (
+            (connection['manager'] and connection['connectionId'] != connection_id) or
+            (not connection['manager'] and connection['manager_id'] != connection_id)
+    ):
+        payload['statusCode'] = 404
+        payload['error'] = {
+            'code': 'ResourceNotFound',
+            'message': f'The connection {input.get("connectionId", connection_id)} was not found',
+        }
+        return post_to_connection()
+
+    try:
+        resp = sessions.items(
+            request.account_id(),
+            'Connections',
+            connection['connectionId'],
+            params=QueryParams(
+                limit=input.get('limit', MAX_ITEMS),
+                next_token=input.get('nextToken', None),
+            )
+        )
+        payload['body'] = {
+            'items': resp.items,
+            'nextToken': resp.next_token,
+            'connectionId': connection['connectionId']
+        }
+    except Exception as e:
+        logger.error(
+            f"Failed to listSessions for {connection['connectionId']}:",
+            exc_info=e
+        )
+        payload['statusCode'] = 500
+        payload['error'] = {
+            'code': 'InternalServerError',
+            'message': str(e)
+        }
 
     return post_to_connection()
