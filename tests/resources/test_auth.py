@@ -292,4 +292,4 @@ def test_login_token_through_manager(requests_mock, auth):
     }
     updated_connection = connections.get('123456789012', item_id=connectionId)
     assert updated_connection['managerId'] == managerId
-    assert updated_connection['manager'] == False
+    assert not updated_connection['manager']
