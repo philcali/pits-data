@@ -2,12 +2,53 @@ import boto3
 import json
 from ophis.globals import app_context
 from unittest.mock import MagicMock, patch
+from uuid import uuid4
+
+
+def test_invoke_unauthorized(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': False,
+        }
+    )
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == connectionId
+        assert Data.decode('utf-8') == json.dumps({
+            'response': {
+                'statusCode': 401,
+                'error': {
+                    'code': 'AccessDenied',
+                    'message': f'Connection {connectionId} is not authorized',
+                },
+            }
+        })
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        iot(routeKey="invoke", connectionId=connectionId, body={})
+
+    mock_client.assert_called_once()
 
 
 def test_invoke_validate(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+        }
+    )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 400,
@@ -21,15 +62,24 @@ def test_invoke_validate(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", body={})
+        iot(routeKey="invoke", connectionId=connectionId, body={})
 
     mock_client.assert_called_once()
 
 
 def test_invoke_validate_event(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+        }
+    )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 400,
@@ -43,7 +93,7 @@ def test_invoke_validate_event(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", body={
+        iot(routeKey="invoke", connectionId=connectionId, body={
             'camera': 'PitsCamera1',
             'event': {
             }
@@ -53,9 +103,18 @@ def test_invoke_validate_event(iot):
 
 
 def test_invoke_validate_session(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+        }
+    )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 400,
@@ -69,7 +128,7 @@ def test_invoke_validate_session(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", body={
+        iot(routeKey="invoke", connectionId=connectionId, body={
             'camera': 'PitsCamera1',
             'event': {
                 'name': 'recording',
@@ -84,9 +143,18 @@ def test_invoke_validate_session(iot):
 
 
 def test_invoke_non_session(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+        }
+    )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 200,
@@ -99,7 +167,7 @@ def test_invoke_non_session(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", body={
+        iot(routeKey="invoke", connectionId=connectionId, body={
             'invokeId': 'abc-123',
             'camera': 'PitsCamera1',
             'event': {
@@ -111,9 +179,18 @@ def test_invoke_non_session(iot):
 
 
 def test_invoke_start_session(iot):
+    connectionId = str(uuid4())
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+        }
+    )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 200,
@@ -126,7 +203,7 @@ def test_invoke_start_session(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", body={
+        iot(routeKey="invoke", connectionId=connectionId, body={
             'invokeId': 'abc-123',
             'camera': 'PitsCamera1',
             'event': {
@@ -142,15 +219,25 @@ def test_invoke_start_session(iot):
     session = sessions.get(
         '123456789012',
         'Connections',
-        '$connectionId',
+        connectionId,
         item_id='abc-123'
     )
     assert session['invokeId'] == 'abc-123'
-    assert session['connectionId'] == '$connectionId'
+    assert session['connectionId'] == connectionId
     assert session['camera'] == 'PitsCamera1'
 
 
 def test_invoke_stop_session(iot):
+    connectionId = 'other-con-id'
+    connections = app_context.resolve()['connections']
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': connectionId,
+            'authorized': True,
+            'manager': True,
+        }
+    )
 
     sessions = app_context.resolve()['sessions']
     sessions.create(
@@ -164,7 +251,7 @@ def test_invoke_stop_session(iot):
     )
 
     def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "other-con-id"
+        assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
                 'statusCode': 200,
@@ -177,7 +264,7 @@ def test_invoke_stop_session(iot):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        iot(routeKey="invoke", connectionId='other-con-id', body={
+        iot(routeKey="invoke", connectionId=connectionId, body={
             'invokeId': 'abc-123',
             'camera': 'PitsCamera1',
             'event': {
@@ -192,22 +279,13 @@ def test_invoke_stop_session(iot):
     assert sessions.get(
         '123456789012',
         'Connections',
-        'other-con-id',
+        connectionId,
         item_id='abc-123'
     ) is None
 
 
 def test_list_sessions_self(iot):
     sessions = app_context.resolve()['sessions']
-    connections = app_context.resolve()['connections']
-
-    connections.create(
-        '123456789012',
-        item={
-            'connectionId': 'other-con-id',
-            'manager': True,
-        }
-    )
 
     session = sessions.create(
         '123456789012',
@@ -244,6 +322,38 @@ def test_list_sessions_self(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="listSessions", connectionId='other-con-id', body={})
+
+    mock_client.assert_called_once()
+
+
+def test_list_sessions_unauthorized(iot):
+    connections = app_context.resolve()['connections']
+
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': 'unauthorized-id',
+            'authorized': False,
+            'manager': True,
+        }
+    )
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == "unauthorized-id"
+        assert json.loads(Data.decode('utf-8')) == {
+            'response': {
+                'statusCode': 401,
+                'error': {
+                    'code': 'AccessDenied',
+                    'message': 'Connection unauthorized-id is not authorized'
+                }
+            }
+        }
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        iot(routeKey="listSessions", connectionId='unauthorized-id', body={})
 
     mock_client.assert_called_once()
 
@@ -303,7 +413,8 @@ def test_list_sessions_managed(iot):
         item={
             'connectionId': 'child-con-id',
             'manager': False,
-            'manager_id': 'other-con-id'
+            'authorized': True,
+            'managerId': 'other-con-id'
         }
     )
 

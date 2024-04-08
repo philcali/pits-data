@@ -24,3 +24,11 @@ def iot(table):
     from pinthesky.resource import iot
 
     return Resources(iot)
+
+
+@pytest.fixture(scope="module")
+def auth(table):
+    assert table.name == 'Pits'
+    from pinthesky.resource import auth
+
+    return Resources(auth)

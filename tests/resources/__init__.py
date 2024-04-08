@@ -15,7 +15,15 @@ class Resources():
     def __call__(self, *args, **kwds):
         return self.request('/'.join(args), **kwds)
 
-    def __read_event(self, path, method="GET", query_params={}, body=None, routeKey="$default", connectionId="$connectionId", headers={}):
+    def __read_event(self,
+                     path,
+                     method="GET",
+                     query_params={},
+                     body=None,
+                     routeKey="$default",
+                     connectionId="$connectionId",
+                     headers={},
+                     authoizer={}):
         with open('events/resources/request.template.json') as f:
             content = f.read()
             template = Template(content)
@@ -28,13 +36,22 @@ class Resources():
             ))
             event['headers'] = headers
             event['queryStringParameters'] = query_params
+            event['requestContext']['authorizer'] = authoizer
         return event
 
     def account_id(self):
         event = self.__read_event("/")
         return event['requestContext']['accountId']
 
-    def request(self, name="", method='GET', query_params={}, body=None, routeKey="$defaut", connectionId="$connectionId", headers={}):
+    def request(self,
+                name="",
+                method='GET',
+                query_params={},
+                body=None,
+                routeKey="$defaut",
+                connectionId="$connectionId",
+                headers={},
+                authorizer={}):
         path = f'/{self.resource_name}{name}'
         event = self.__read_event(
             headers=headers,
@@ -44,6 +61,7 @@ class Resources():
             query_params=query_params,
             body=body,
             routeKey=routeKey,
+            authoizer=authorizer
         )
         res = api(event=event, context=Context(
             invoked_function_arn=':'.join([

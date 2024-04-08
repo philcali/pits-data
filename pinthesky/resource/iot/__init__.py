@@ -2,7 +2,7 @@ import boto3
 import json
 import logging
 import os
-from ophis.database import QueryParams, MAX_ITEMS
+from ophis.database import Repository, QueryParams, MAX_ITEMS
 from ophis.globals import app_context, request
 from pinthesky import api, management
 from pinthesky.database import DataSessions
@@ -20,13 +20,26 @@ app_context.inject(
 
 
 @api.routeKey('invoke')
-def invoke(iot_data, sessions):
-    input = json.loads(request.body)
+def invoke(iot_data, connections, sessions):
+    input = {} if request.body == "" else json.loads(request.body)
     payload = {'statusCode': 200}
 
     @management.post()
     def post_to_connection():
         return payload
+
+    connection = connections.get(
+        request.account_id(),
+        item_id=request.request_context('connectionId'),
+    )
+
+    if connection is None or not connection['authorized']:
+        payload['statusCode'] = 401
+        payload['error'] = {
+            'code': 'AccessDenied',
+            'message': f'Connection {request.request_context("connectionId")} is not authorized',
+        }
+        return post_to_connection()
 
     def validate_input(field, obj, force=False):
         if force or field not in obj:
@@ -55,7 +68,6 @@ def invoke(iot_data, sessions):
         return post_to_connection()
 
     invoke_id = input.get('invokeId', str(uuid4()))
-
     if session.get('start', False):
         sessions.create(
             request.account_id(),
@@ -99,14 +111,22 @@ def list_sessions(connections, sessions):
 
     connection_id = request.request_context('connectionId')
     input = {'connectionId': connection_id} if request.body == "" else json.loads(request.body)
-    connection = connections.get(
-        request.account_id(),
-        item_id=input.get('connectionId', connection_id)
-    )
+    reads = [
+        {
+            'repository': connections,
+            'id': connection_id,
+        },
+    ]
+    if input.get('connectionId', connection_id) != connection_id:
+        reads.append({
+            'repository': connections,
+            'id': input['connectionId'],
+        })
+    batches = Repository.batch_read(request.account_id(), reads=reads)
     # We'll allow a connection to list its own sessions or managed sessions
-    if connection is None or (
-            (connection['manager'] and connection['connectionId'] != connection_id) or
-            (not connection['manager'] and connection['manager_id'] != connection_id)
+    if len(batches) == 0 or (
+            (batches[-1]['manager'] and batches[-1]['connectionId'] != connection_id) or
+            (not batches[-1]['manager'] and batches[-1]['managerId'] != connection_id)
     ):
         payload['statusCode'] = 404
         payload['error'] = {
@@ -115,11 +135,19 @@ def list_sessions(connections, sessions):
         }
         return post_to_connection()
 
+    if not batches[0]['authorized']:
+        payload['statusCode'] = 401
+        payload['error'] = {
+            'code': 'AccessDenied',
+            'message': f'Connection {connection_id} is not authorized'
+        }
+        return post_to_connection()
+
     try:
         resp = sessions.items(
             request.account_id(),
             'Connections',
-            connection['connectionId'],
+            batches[-1]['connectionId'],
             params=QueryParams(
                 limit=input.get('limit', MAX_ITEMS),
                 next_token=input.get('nextToken', None),
@@ -128,11 +156,11 @@ def list_sessions(connections, sessions):
         payload['body'] = {
             'items': resp.items,
             'nextToken': resp.next_token,
-            'connectionId': connection['connectionId']
+            'connectionId': batches[-1]['connectionId']
         }
     except Exception as e:
         logger.error(
-            f"Failed to listSessions for {connection['connectionId']}:",
+            f"Failed to listSessions for {batches[-1]['connectionId']}:",
             exc_info=e
         )
         payload['statusCode'] = 500
