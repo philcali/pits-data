@@ -13,3 +13,10 @@ class DataSessions(Repository):
         super().__init__(table=table, type="DataSessions", fields_to_keys={
             'invokeId': 'SK',
         })
+
+
+class DataTokens(Repository):
+    def __init__(self, table=None) -> None:
+        super().__init__(table=table, type="DataTokens", fields_to_keys={
+            'id': 'SK',
+        })

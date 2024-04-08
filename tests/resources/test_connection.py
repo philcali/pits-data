@@ -35,6 +35,7 @@ def test_default(connections):
                 },
                 'body': {
                     'availableActions': [
+                        'login',
                         'invoke',
                         'listSessions',
                     ]
@@ -46,6 +47,28 @@ def test_default(connections):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         connections(routeKey="$default")
+
+    mock_client.assert_called_once()
+
+
+def test_connect_invalid(connections):
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == "$connectionId"
+        assert Data.decode('utf-8') == json.dumps({
+            'response': {
+                'statusCode': 400,
+                'error': {
+                    'code': 'InvalidInput',
+                    'message': 'Invalid subprotocol. Expected manager or child'
+                }
+            }
+        })
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        connections(routeKey="$connect")
 
     mock_client.assert_called_once()
 
@@ -66,7 +89,9 @@ def test_connect(connections):
     management = MagicMock()
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(routeKey="$connect")
+        connections(routeKey="$connect", headers={
+            'Sec-Websocket-Protocol': 'manager',
+        })
 
     mock_client.assert_called_once()
 
@@ -88,7 +113,8 @@ def test_connect_session(connections):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         connections(routeKey="$connect", connectionId="abc-123", headers={
-            'ManagerId': "$connectionId"
+            'ManagerId': "$connectionId",
+            'Sec-Websocket-Protocol': 'child',
         })
 
     mock_client.assert_called_once()
@@ -98,8 +124,6 @@ def test_disconnect_session(connections):
 
     management = MagicMock()
     with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(routeKey="$disconnect", connectionId="abc-123", headers={
-            'ManagerId': "$connectionId"
-        })
+        connections(routeKey="$disconnect", connectionId="abc-123")
 
     mock_client.assert_called_once()

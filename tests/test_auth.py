@@ -43,7 +43,7 @@ def test_no_header():
         'policyDocument': {
             'Statement': [
                 {
-                    'Effect': 'Deny',
+                    'Effect': 'Allow',
                     'Action': 'execute-api:Invoke',
                     'Resource': '$connect',
                 }

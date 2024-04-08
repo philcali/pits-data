@@ -1,9 +1,9 @@
 from ophis import set_stream_logger
 from pinthesky import api, management
-from pinthesky.resource import inject, connection, iot
+from pinthesky.resource import inject, connection, iot, auth
 
 
-for module in [inject, connection, iot]:
+for module in [inject, connection, iot, auth]:
     set_stream_logger(module.__name__)
 
 
@@ -18,6 +18,7 @@ def default():
         },
         'body': {
             'availableActions': [
+                'login',
                 'invoke',
                 'listSessions',
             ]

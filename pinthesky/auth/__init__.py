@@ -78,7 +78,7 @@ def user_jwt(event, context):
     token = event['headers'].get('Authorization', None)
     if token is None:
         logger.info('Event did not contain an Authorization header.')
-        return JWTAuthorizer.generate_policy(connectionId, 'Deny', event['methodArn'])
+        return JWTAuthorizer.generate_policy(connectionId, 'Allow', event['methodArn'])
     logger.debug(f'Provided token {token}')
     try:
         keys = JWTAuthorizer.pull_known_keys(os.getenv("USER_POOL_ID"))
@@ -89,7 +89,8 @@ def user_jwt(event, context):
                 principal=connectionId,
                 effect='Allow',
                 resource=event['methodArn'],
-                context=claims)
+                context=claims
+            )
     except Exception as e:
         logger.error('Failed to create authorizer:', exc_info=e)
     return JWTAuthorizer.generate_policy(connectionId, 'Deny', event['methodArn'])
