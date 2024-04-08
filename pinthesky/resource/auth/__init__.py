@@ -104,6 +104,7 @@ def login(connections, data_tokens):
                 'manager': 'managerId' not in input,
                 'authorized': True,
                 'claims': claims,
+                'expiresIn': claims['exp'],
             }
         }
     ]
@@ -116,6 +117,7 @@ def login(connections, data_tokens):
                 'connectionId': request.request_context('connectionId'),
                 'authorized': True,
                 'claims': claims,
+                'expiresIn': claims['exp'],
             }
         })
 

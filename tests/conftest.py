@@ -65,7 +65,7 @@ def table(dynamodb):
             {
                 'AttributeName': 'createTime',
                 'AttributeType': 'N'
-            }
+            },
         ],
         ProvisionedThroughput={
             'ReadCapacityUnits': 5,

@@ -28,6 +28,9 @@ def connect(connections):
 
     manager_id = request.headers.get('ManagerId', None)
     connection_id = request.request_context('connectionId')
+    expiresIn = {}
+    if 'exp' in request.authorizer():
+        expiresIn['expiresIn'] = request.authorizer()['exp']
     connections.create(
         request.account_id(),
         item={
@@ -36,6 +39,7 @@ def connect(connections):
             'manager': manager_id is None,
             'authorized': 'sub' in request.authorizer(),
             'claims': request.authorizer(),
+            **expiresIn,
         })
 
     if protocol == 'manager':
@@ -52,7 +56,10 @@ def connect(connections):
             request.account_id(),
             'Manager',
             manager_id,
-            item={'connectionId': connection_id})
+            item={
+                'connectionId': connection_id,
+                **expiresIn,
+            })
 
         @management.post(connectionId=manager_id)
         def post_child_to_manager():
