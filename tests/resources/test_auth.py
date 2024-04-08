@@ -4,7 +4,7 @@ import os
 from ophis.globals import app_context
 from requests import exceptions
 from unittest.mock import patch, MagicMock
-from tests.test_auth import ENDPOINT, FAKE_KEYS, FAKE_TOKEN
+from test_auth import ENDPOINT, FAKE_KEYS, FAKE_TOKEN
 from uuid import uuid4
 
 
