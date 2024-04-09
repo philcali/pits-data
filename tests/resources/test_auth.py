@@ -14,6 +14,7 @@ def test_login_not_found(auth):
         assert ConnectionId == 'not-found-id'
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 401,
                 'error': {
                     'code': 'AccessDenied',
@@ -45,6 +46,7 @@ def test_login_already_authorized(auth):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 200,
                 'body': {
                     'authorized': True
@@ -75,6 +77,7 @@ def test_login_input_input(auth):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 400,
                 'error': {
                     'code': 'InvalidInput',
@@ -111,6 +114,7 @@ def test_login_jwt_failed(requests_mock, auth):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 401,
                 'error': {
                     'code': 'AccessDenied',
@@ -151,6 +155,7 @@ def test_login_token_not_found(requests_mock, auth):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 401,
                 'error': {
                     'code': 'AccessDenied',
@@ -203,6 +208,7 @@ def test_login_token_successful_login(requests_mock, auth):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 200,
                 'body': {
                     'authorized': True,
@@ -268,6 +274,7 @@ def test_login_token_through_manager(requests_mock, auth):
         assert ConnectionId == managerId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'login',
                 'statusCode': 200,
                 'body': {
                     'authorized': True,

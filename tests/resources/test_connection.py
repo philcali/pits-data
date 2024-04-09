@@ -30,6 +30,7 @@ def test_default(connections):
         assert ConnectionId == "$connectionId"
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': '$default',
                 'statusCode': 404,
                 'error': {
                     'code': 'ResourceNotFound',
@@ -59,6 +60,7 @@ def test_connect_invalid(connections):
         assert ConnectionId == "$connectionId"
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': '$connect',
                 'statusCode': 400,
                 'error': {
                     'code': 'InvalidInput',
@@ -82,6 +84,7 @@ def test_connect(connections):
         assert ConnectionId == "$connectionId"
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': '$connect',
                 'statusCode': 200,
                 'body': {
                     'connectionId': ConnectionId,
@@ -120,6 +123,7 @@ def test_connect_session(connections):
         assert ConnectionId == "$connectionId"
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': '$connect',
                 'statusCode': 200,
                 'body': {
                     'connectionId': "abc-123",

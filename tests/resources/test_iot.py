@@ -20,6 +20,7 @@ def test_invoke_unauthorized(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 401,
                 'error': {
                     'code': 'AccessDenied',
@@ -51,6 +52,7 @@ def test_invoke_validate(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 400,
                 'error': {
                     'code': 'InvalidInput',
@@ -82,6 +84,7 @@ def test_invoke_validate_event(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 400,
                 'error': {
                     'code': 'InvalidInput',
@@ -117,6 +120,7 @@ def test_invoke_validate_session(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 400,
                 'error': {
                     'code': 'InvalidInput',
@@ -157,6 +161,7 @@ def test_invoke_non_session(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
@@ -193,6 +198,7 @@ def test_invoke_start_session(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
@@ -254,6 +260,7 @@ def test_invoke_stop_session(iot):
         assert ConnectionId == connectionId
         assert Data.decode('utf-8') == json.dumps({
             'response': {
+                'action': 'invoke',
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
@@ -307,6 +314,7 @@ def test_list_sessions_self(iot):
         assert ConnectionId == "other-con-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 200,
                 'body': {
                     'items': [
@@ -342,6 +350,7 @@ def test_list_sessions_unauthorized(iot):
         assert ConnectionId == "unauthorized-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 401,
                 'error': {
                     'code': 'AccessDenied',
@@ -364,6 +373,7 @@ def test_list_sessions_not_found(iot):
         assert ConnectionId == "not-found-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 404,
                 'error': {
                     'code': 'ResourceNotFound',
@@ -386,6 +396,7 @@ def test_list_sessions_not_found_other(iot):
         assert ConnectionId == "not-found-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 404,
                 'error': {
                     'code': 'ResourceNotFound',
@@ -438,6 +449,7 @@ def test_list_sessions_managed(iot):
         assert ConnectionId == "other-con-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 200,
                 'body': {
                     'items': [
@@ -465,6 +477,7 @@ def test_list_sessions_not_found_other_session(iot):
         assert ConnectionId == "not-found-id"
         assert json.loads(Data.decode('utf-8')) == {
             'response': {
+                'action': 'listSessions',
                 'statusCode': 404,
                 'error': {
                     'code': 'ResourceNotFound',
