@@ -97,8 +97,10 @@ def test_invoke_validate_event(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
-            'camera': 'PitsCamera1',
-            'event': {
+            'payload': {
+                'camera': 'PitsCamera1',
+                'event': {
+                }
             }
         })
 
@@ -133,12 +135,14 @@ def test_invoke_validate_session(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
-            'camera': 'PitsCamera1',
-            'event': {
-                'name': 'recording',
-                'session': {
-                    'start': True,
-                    'stop': True
+            'payload': {
+                'camera': 'PitsCamera1',
+                'event': {
+                    'name': 'recording',
+                    'session': {
+                        'start': True,
+                        'stop': True
+                    }
                 }
             }
         })
@@ -173,10 +177,12 @@ def test_invoke_non_session(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
-            'invokeId': 'abc-123',
-            'camera': 'PitsCamera1',
-            'event': {
-                'name': 'capture_image',
+            'payload': {
+                'invokeId': 'abc-123',
+                'camera': 'PitsCamera1',
+                'event': {
+                    'name': 'capture_image',
+                }
             }
         })
 
@@ -210,12 +216,14 @@ def test_invoke_start_session(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
-            'invokeId': 'abc-123',
-            'camera': 'PitsCamera1',
-            'event': {
-                'name': 'recording',
-                'session': {
-                    'start': True,
+            'payload': {
+                'invokeId': 'abc-123',
+                'camera': 'PitsCamera1',
+                'event': {
+                    'name': 'recording',
+                    'session': {
+                        'start': True,
+                    }
                 }
             }
         })
@@ -272,12 +280,14 @@ def test_invoke_stop_session(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
-            'invokeId': 'abc-123',
-            'camera': 'PitsCamera1',
-            'event': {
-                'name': 'recording',
-                'session': {
-                    'stop': True,
+            'payload': {
+                'invokeId': 'abc-123',
+                'camera': 'PitsCamera1',
+                'event': {
+                    'name': 'recording',
+                    'session': {
+                        'stop': True,
+                    }
                 }
             }
         })
@@ -409,7 +419,9 @@ def test_list_sessions_not_found_other(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="listSessions", connectionId='not-found-id', body={
-            'connectionId': 'other-con-id',
+            'payload': {
+                'connectionId': 'other-con-id',
+            }
         })
 
     mock_client.assert_called_once()
@@ -465,7 +477,9 @@ def test_list_sessions_managed(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="listSessions", connectionId='other-con-id', body={
-            'connectionId': 'child-con-id'
+            'payload': {
+                'connectionId': 'child-con-id'
+            }
         })
 
     mock_client.assert_called_once()
@@ -490,7 +504,9 @@ def test_list_sessions_not_found_other_session(iot):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="listSessions", connectionId='not-found-id', body={
-            'connectionId': 'child-con-id',
+            'payload': {
+                'connectionId': 'child-con-id',
+            }
         })
 
     mock_client.assert_called_once()

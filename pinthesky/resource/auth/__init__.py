@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @api.routeKey('login')
 def login(connections, data_tokens):
-    input = {} if request.body == "" else json.loads(request.body)
+    input = json.loads(request.body).get('payload', {})
     connection_id = input.get('managerId', request.request_context('connectionId'))
     connection = connections.get(
         request.account_id(),
