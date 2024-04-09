@@ -55,60 +55,26 @@ def test_default(connections):
 
 
 def test_connect_invalid(connections):
-
-    def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
-        assert Data.decode('utf-8') == json.dumps({
-            'response': {
-                'action': '$connect',
-                'statusCode': 400,
-                'error': {
-                    'code': 'InvalidInput',
-                    'message': 'Invalid subprotocol. Expected manager or child'
-                }
-            }
-        })
-
-    management = MagicMock()
-    management.post_to_connection = post_to_connection
-    with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(routeKey="$connect")
-
-    mock_client.assert_called_once()
+    resp = connections(routeKey="$connect")
+    assert resp.code == 400
 
 
 def test_connect(connections):
     connectDb = app_context.resolve()['connections']
-
-    def post_to_connection(ConnectionId, Data):
-        assert ConnectionId == "$connectionId"
-        assert Data.decode('utf-8') == json.dumps({
-            'response': {
-                'action': '$connect',
-                'statusCode': 200,
-                'body': {
-                    'connectionId': ConnectionId,
-                },
-            }
-        })
-
     exp = floor(time.time()) + 60 * 1000
-    management = MagicMock()
-    management.post_to_connection = post_to_connection
-    with patch.object(boto3, 'client', return_value=management) as mock_client:
-        connections(
-            routeKey="$connect",
-            headers={
-                'Sec-Websocket-Protocol': 'manager',
-            },
-            authorizer={
-                "sub": "98498077-4c1d-4ffb-ab3d-8532dce5db4d",
-                "event_id": "f2c58f6d-3bc5-45ed-8a04-885d7f685f66",
-                "token_use": "id",
-                "exp": exp,
-            })
+    resp = connections(
+        routeKey="$connect",
+        headers={
+            'Sec-WebSocket-Protocol': 'manager',
+        },
+        authorizer={
+            "sub": "98498077-4c1d-4ffb-ab3d-8532dce5db4d",
+            "event_id": "f2c58f6d-3bc5-45ed-8a04-885d7f685f66",
+            "token_use": "id",
+            "exp": exp,
+        })
+    assert resp.code == 200
 
-    mock_client.assert_called_once()
     connect = connectDb.get(
         '123456789012',
         item_id='$connectionId'
@@ -136,7 +102,7 @@ def test_connect_session(connections):
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         connections(routeKey="$connect", connectionId="abc-123", headers={
             'ManagerId': "$connectionId",
-            'Sec-Websocket-Protocol': 'child',
+            'Sec-WebSocket-Protocol': 'child',
         })
 
     mock_client.assert_called_once()

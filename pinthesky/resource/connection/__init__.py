@@ -1,5 +1,5 @@
 import logging
-from ophis.globals import app_context, request
+from ophis.globals import app_context, request, response
 from pinthesky.database import DataConnections
 from pinthesky.util import iterate_all_items
 from pinthesky import api, management
@@ -12,21 +12,14 @@ app_context.inject('connections', DataConnections())
 @api.routeKey('$connect')
 def connect(connections):
 
-    logger.info(f'Event: {request.event}')
-
-    @management.post()
-    def post_error(reason, status_code=400, code='InvalidInput'):
+    protocol = request.headers.get('Sec-WebSocket-Protocol', None)
+    if protocol is None or protocol not in ['manager', 'child']:
+        response.status_code = 400
         return {
-            'statusCode': status_code,
-            'error': {
-                'code': code,
-                'message': reason,
+            'body': {
+                'message': f'Invalid protocol: {protocol}'
             }
         }
-
-    protocol = request.headers.get('Sec-Websocket-Protocol', None)
-    if protocol is None or protocol not in ['manager', 'child']:
-        return post_error('Invalid subprotocol. Expected manager or child')
 
     manager_id = request.headers.get('ManagerId', None)
     connection_id = request.request_context('connectionId')
@@ -47,11 +40,7 @@ def connect(connections):
     if protocol == 'manager':
         logger.info("Started a manager connection")
 
-        @management.post()
-        def post_manager():
-            return {'body': {'connectionId': connection_id}}
-
-        post_manager()
+        return {'body': {'connectionId': connection_id}}
     elif protocol == 'child' and manager_id is not None:
         logger.info(f'Started a child connection on manager {manager_id}')
         connections.create(
