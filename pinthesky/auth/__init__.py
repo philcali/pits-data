@@ -7,7 +7,7 @@ from ophis import set_stream_logger
 from requests import get
 
 
-logger = logging.getLogger('jwt')
+logger = logging.getLogger(__name__)
 
 
 class JWTAuthorizer:
@@ -73,7 +73,7 @@ class JWTAuthorizer:
 
 
 def user_jwt(event, context):
-    set_stream_logger('jwt')
+    set_stream_logger('pinthesky', level=os.getenv("LOG_LEVEL", "INFO"))
     connectionId = event['requestContext']['connectionId']
     token = event['headers'].get('Authorization', None)
     if token is None:
