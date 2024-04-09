@@ -28,7 +28,7 @@ class ManagementWrapper:
 
     def connection_url(self):
         override = os.getenv('SERVICE_DOMAIN')
-        return override if override is not None else f'{request.request_context("domainName")}/{request.request_context("stage")}'
+        return override if override != '' else f'{request.request_context("domainName")}/{request.request_context("stage")}'
 
     def client(self):
         return boto3.client(
