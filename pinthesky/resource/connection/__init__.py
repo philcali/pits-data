@@ -12,6 +12,8 @@ app_context.inject('connections', DataConnections())
 @api.routeKey('$connect')
 def connect(connections):
 
+    logger.info(f'Event: {request.event}')
+
     @management.post()
     def post_error(reason, status_code=400, code='InvalidInput'):
         return {
