@@ -102,7 +102,7 @@ def test_connect_session(connections):
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         connections(routeKey="$connect", connectionId="abc-123", headers={
             'ManagerId': "$connectionId",
-            'Sec-WebSocket-Protocol': 'child',
+            'Sec-WebSocket-Protocol': 'session',
         })
 
     mock_client.assert_called_once()

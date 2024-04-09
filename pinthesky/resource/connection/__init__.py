@@ -13,7 +13,7 @@ app_context.inject('connections', DataConnections())
 def connect(connections):
 
     protocol = request.headers.get('Sec-WebSocket-Protocol', None)
-    if protocol is None or protocol not in ['manager', 'child']:
+    if protocol is None or protocol not in ['manager', 'session']:
         response.status_code = 400
         return {
             'body': {
@@ -39,9 +39,9 @@ def connect(connections):
 
     if protocol == 'manager':
         logger.info("Started a manager connection")
-
+        response.headers['Sec-WebSocket-Protocol'] = 'manager'
         return {'body': {'connectionId': connection_id}}
-    elif protocol == 'child' and manager_id is not None:
+    elif protocol == 'session' and manager_id is not None:
         logger.info(f'Started a child connection on manager {manager_id}')
         connections.create(
             request.account_id(),
@@ -56,6 +56,7 @@ def connect(connections):
         def post_child_to_manager():
             return {'body': {'connectionId': connection_id}}
 
+        response.headers['Sec-WebSocket-Protocol'] = 'session'
         post_child_to_manager()
 
 
