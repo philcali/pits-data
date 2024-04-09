@@ -122,5 +122,8 @@ def login(connections, data_tokens):
         })
 
     Repository.batch_write(request.account_id(), updates=updates)
-    payload['body'] = {'authorized': True}
+    payload['body'] = {
+        'authorized': True,
+        'connectionId': request.request_context('connectionId')
+    }
     return post_to_connection()
