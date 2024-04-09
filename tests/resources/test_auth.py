@@ -222,6 +222,7 @@ def test_login_token_successful_login(requests_mock, auth):
                 'statusCode': 200,
                 'body': {
                     'authorized': True,
+                    'connectionId': connectionId,
                 },
                 'requestId': 'id'
             }
@@ -291,6 +292,7 @@ def test_login_token_through_manager(requests_mock, auth):
                 'statusCode': 200,
                 'body': {
                     'authorized': True,
+                    'connectionId': connectionId
                 },
                 'requestId': 'id'
             }
