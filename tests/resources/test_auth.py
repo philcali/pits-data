@@ -20,6 +20,7 @@ def test_login_not_found(auth):
                     'code': 'AccessDenied',
                     'message': 'Connection is not valid',
                 },
+                'requestId': 'id',
             }
         })
 
@@ -50,7 +51,8 @@ def test_login_already_authorized(auth):
                 'statusCode': 200,
                 'body': {
                     'authorized': True
-                }
+                },
+                'requestId': 'id',
             }
         })
 
@@ -82,7 +84,8 @@ def test_login_input_input(auth):
                 'error': {
                     'code': 'InvalidInput',
                     'message': 'Input payload tokenId is invalid'
-                }
+                },
+                'requestId': 'id',
             }
         })
 
@@ -119,7 +122,8 @@ def test_login_jwt_failed(requests_mock, auth):
                 'error': {
                     'code': 'AccessDenied',
                     'message': 'JWT token is not valid'
-                }
+                },
+                'requestId': 'abc-123'
             }
         })
 
@@ -130,7 +134,8 @@ def test_login_jwt_failed(requests_mock, auth):
             'payload': {
                 'tokenId': 'abc-123',
                 'jwtId': FAKE_TOKEN,
-            }
+            },
+            'requestId': 'abc-123'
         })
 
     mock_client.assert_called_once()
@@ -162,7 +167,8 @@ def test_login_token_not_found(requests_mock, auth):
                 'error': {
                     'code': 'AccessDenied',
                     'message': 'Token is not valid'
-                }
+                },
+                'requestId': 'id'
             }
         })
 
@@ -216,7 +222,8 @@ def test_login_token_successful_login(requests_mock, auth):
                 'statusCode': 200,
                 'body': {
                     'authorized': True,
-                }
+                },
+                'requestId': 'id'
             }
         })
 
@@ -284,7 +291,8 @@ def test_login_token_through_manager(requests_mock, auth):
                 'statusCode': 200,
                 'body': {
                     'authorized': True,
-                }
+                },
+                'requestId': 'id'
             }
         })
 

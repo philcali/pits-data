@@ -66,8 +66,16 @@ class ManagementWrapper:
                     'statusCode': 200,
                 }
                 try:
+                    requestId = request.request_context("requestId")
+                    try:
+                        requestId = json.loads(request.body).get("requestId", requestId)
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to parse input for request ID:",
+                            exc_info=e
+                        )
                     payload = func(*args, **kwargs)
-                    template = {**template, **payload}
+                    template = {**template, **payload, 'requestId': requestId}
                 except Exception as e:
                     logger.error(f'Failed to create body for {conId}')
                     template['statusCode'] = 500

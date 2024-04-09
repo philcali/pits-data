@@ -43,6 +43,7 @@ def test_default(connections):
                         'listSessions',
                     ]
                 },
+                'requestId': 'id',
             }
         })
 
@@ -94,6 +95,7 @@ def test_connect_session(connections):
                 'body': {
                     'connectionId': "abc-123",
                 },
+                'requestId': 'id',
             }
         })
 

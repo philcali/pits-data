@@ -26,6 +26,7 @@ def test_invoke_unauthorized(iot):
                     'code': 'AccessDenied',
                     'message': f'Connection {connectionId} is not authorized',
                 },
+                'requestId': 'id'
             }
         })
 
@@ -58,6 +59,7 @@ def test_invoke_validate(iot):
                     'code': 'InvalidInput',
                     'message': 'Input payload camera is invalid',
                 },
+                'requestId': 'id'
             }
         })
 
@@ -90,6 +92,7 @@ def test_invoke_validate_event(iot):
                     'code': 'InvalidInput',
                     'message': 'Input payload name is invalid',
                 },
+                'requestId': 'id'
             }
         })
 
@@ -128,6 +131,7 @@ def test_invoke_validate_session(iot):
                     'code': 'InvalidInput',
                     'message': 'Input payload session is invalid',
                 },
+                'requestId': 'id'
             }
         })
 
@@ -169,7 +173,8 @@ def test_invoke_non_session(iot):
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
-                }
+                },
+                'requestId': 'efg-456'
             }
         })
 
@@ -182,8 +187,9 @@ def test_invoke_non_session(iot):
                 'camera': 'PitsCamera1',
                 'event': {
                     'name': 'capture_image',
-                }
-            }
+                },
+            },
+            'requestId': 'efg-456'
         })
 
     mock_client.assert_called_once()
@@ -208,7 +214,8 @@ def test_invoke_start_session(iot):
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
-                }
+                },
+                'requestId': 'id'
             }
         })
 
@@ -272,7 +279,8 @@ def test_invoke_stop_session(iot):
                 'statusCode': 200,
                 'body': {
                     'invokeId': 'abc-123'
-                }
+                },
+                'requestId': 'id',
             }
         })
 
@@ -332,7 +340,8 @@ def test_list_sessions_self(iot):
                     ],
                     'nextToken': None,
                     'connectionId': 'other-con-id',
-                }
+                },
+                'requestId': 'id'
             }
         }
 
@@ -365,7 +374,8 @@ def test_list_sessions_unauthorized(iot):
                 'error': {
                     'code': 'AccessDenied',
                     'message': 'Connection unauthorized-id is not authorized'
-                }
+                },
+                'requestId': 'id'
             }
         }
 
@@ -388,7 +398,8 @@ def test_list_sessions_not_found(iot):
                 'error': {
                     'code': 'ResourceNotFound',
                     'message': 'The connection not-found-id was not found'
-                }
+                },
+                'requestId': 'id'
             }
         }
 
@@ -411,7 +422,8 @@ def test_list_sessions_not_found_other(iot):
                 'error': {
                     'code': 'ResourceNotFound',
                     'message': 'The connection other-con-id was not found'
-                }
+                },
+                'requestId': 'id'
             }
         }
 
@@ -469,7 +481,8 @@ def test_list_sessions_managed(iot):
                     ],
                     'nextToken': None,
                     'connectionId': 'child-con-id',
-                }
+                },
+                'requestId': 'id'
             }
         }
 
@@ -496,7 +509,8 @@ def test_list_sessions_not_found_other_session(iot):
                 'error': {
                     'code': 'ResourceNotFound',
                     'message': 'The connection child-con-id was not found'
-                }
+                },
+                'requestId': 'id'
             }
         }
 
