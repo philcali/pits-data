@@ -127,8 +127,10 @@ def test_login_jwt_failed(requests_mock, auth):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         auth(routeKey="login", connectionId=connectionId, body={
-            'tokenId': 'abc-123',
-            'jwtId': FAKE_TOKEN,
+            'payload': {
+                'tokenId': 'abc-123',
+                'jwtId': FAKE_TOKEN,
+            }
         })
 
     mock_client.assert_called_once()
@@ -168,8 +170,10 @@ def test_login_token_not_found(requests_mock, auth):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         auth(routeKey="login", connectionId=connectionId, body={
-            'tokenId': 'abc-123',
-            'jwtId': FAKE_TOKEN,
+            'payload': {
+                'tokenId': 'abc-123',
+                'jwtId': FAKE_TOKEN,
+            }
         })
 
     mock_client.assert_called_once()
@@ -220,8 +224,10 @@ def test_login_token_successful_login(requests_mock, auth):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         auth(routeKey="login", connectionId=connectionId, body={
-            'tokenId': tokenId,
-            'jwtId': FAKE_TOKEN,
+            'payload': {
+                'tokenId': tokenId,
+                'jwtId': FAKE_TOKEN,
+            }
         })
 
     mock_client.assert_called_once()
@@ -286,9 +292,11 @@ def test_login_token_through_manager(requests_mock, auth):
     management.post_to_connection = post_to_connection
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         auth(routeKey="login", connectionId=connectionId, body={
-            'managerId': managerId,
-            'tokenId': tokenId,
-            'jwtId': FAKE_TOKEN,
+            'payload': {
+                'managerId': managerId,
+                'tokenId': tokenId,
+                'jwtId': FAKE_TOKEN,
+            }
         })
 
     mock_client.assert_called_once()

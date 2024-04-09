@@ -66,7 +66,7 @@ def disconnect(iot_data, connections, sessions):
         request.account_id(),
         item_id=request.request_context('connectionId'),
     )
-    if connection is not None and 'managerId' in connection:
+    if connection is not None and connection.get('managerId') is not None:
         logger.info(f'Removing session tied to {connection["managerId"]}')
         connections.delete(
             request.account_id(),

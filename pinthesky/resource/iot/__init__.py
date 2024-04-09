@@ -21,7 +21,7 @@ app_context.inject(
 
 @api.routeKey('invoke')
 def invoke(iot_data, connections, sessions):
-    input = {} if request.body == "" else json.loads(request.body)
+    input = json.loads(request.body).get('payload', {})
     payload = {'statusCode': 200}
 
     @management.post()
@@ -110,7 +110,7 @@ def list_sessions(connections, sessions):
         return payload
 
     connection_id = request.request_context('connectionId')
-    input = {'connectionId': connection_id} if request.body == "" else json.loads(request.body)
+    input = json.loads(request.body).get('payload', {'connectionId': connection_id})
     reads = [
         {
             'repository': connections,
