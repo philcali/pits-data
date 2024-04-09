@@ -62,6 +62,7 @@ class ManagementWrapper:
                 management = self.client()
                 conId = connectionId if connectionId is not None else request.request_context('connectionId')
                 template = {
+                    'action': request.request_context('routeKey'),
                     'statusCode': 200,
                 }
                 try:
