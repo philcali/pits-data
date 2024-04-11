@@ -208,6 +208,7 @@ def test_login_token_successful_login(requests_mock, auth):
         '123456789012',
         item={
             'id': tokenId,
+            'expiresIn': False,
             'authorization': {
                 'activated': False,
             }
@@ -278,6 +279,7 @@ def test_login_token_through_manager(requests_mock, auth):
         '123456789012',
         item={
             'id': tokenId,
+            'expiresIn': False,
             'authorization': {
                 'activated': False,
             }

@@ -89,6 +89,7 @@ def login(connections, data_tokens):
             'item': {
                 'id': input['tokenId'],
                 'createTime': token['createTime'],
+                'expiresIn': token['expiresIn'],
                 'authorization': {
                     'connectionId': request.request_context('connectionId'),
                     'activated': True,
