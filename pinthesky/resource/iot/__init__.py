@@ -22,16 +22,27 @@ app_context.inject(
 @api.routeKey('invoke')
 def invoke(iot_data, connections, sessions):
     input = json.loads(request.body).get('payload', {})
+    connection_id = input.get('connectionId', request.request_context('connectionId'))
     payload = {'statusCode': 200}
 
     @management.post()
     def post_to_connection():
         return payload
 
-    connection = connections.get(
-        request.account_id(),
-        item_id=request.request_context('connectionId'),
-    )
+    reads = [
+        {
+            'repository': connections,
+            'id': request.request_context('connectionId'),
+        },
+    ]
+    if connection_id != request.request_context('connectionId'):
+        reads.append({
+            'repository': connections,
+            'id': connection_id,
+        })
+
+    cons = Repository.batch_read(request.account_id(), reads=reads)
+    connection = cons[-1]
 
     if connection is None or not connection['authorized']:
         payload['statusCode'] = 401
@@ -72,10 +83,11 @@ def invoke(iot_data, connections, sessions):
         sessions.create(
             request.account_id(),
             'Connections',
-            request.request_context('connectionId'),
+            connection['connectionId'],
             item={
                 'invokeId': invoke_id,
-                'connectionId': request.request_context('connectionId'),
+                'connectionId': connection['connectionId'],
+                'expiresIn': connection['expiresIn'],
                 'camera': input['camera'],
                 'event': input['event'],
             }
@@ -86,13 +98,14 @@ def invoke(iot_data, connections, sessions):
         thing_name=input['camera'],
         event=input['event'],
         invoke_id=invoke_id,
+        manager_id=connection.get('managerId', None),
     )
 
     if session.get('stop', False):
         sessions.delete(
             request.account_id(),
             'Connections',
-            request.request_context('connectionId'),
+            connection['connectionId'],
             item_id=invoke_id
         )
 
