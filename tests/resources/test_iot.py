@@ -254,11 +254,11 @@ def test_invoke_start_session(iot):
     session = sessions.get(
         '123456789012',
         'Connections',
-        connectionId,
+        otherConnectionId,
         item_id='abc-123'
     )
     assert session['invokeId'] == 'abc-123'
-    assert session['connectionId'] == connectionId
+    assert session['connectionId'] == otherConnectionId
     assert session['camera'] == 'PitsCamera1'
 
 
