@@ -205,7 +205,7 @@ def test_invoke_start_session(iot):
         '123456789012',
         item={
             'connectionId': connectionId,
-            'expiresIn': floor(time.time()),
+            'expiresIn': floor(time.time()) + 60 * 1000,
             'authorized': True,
         }
     )
@@ -214,7 +214,7 @@ def test_invoke_start_session(iot):
         item={
             'connectionId': otherConnectionId,
             'managerId': connectionId,
-            'expiresIn': floor(time.time()),
+            'expiresIn': floor(time.time()) + 60 * 1000,
             'authorized': True,
         }
     )
