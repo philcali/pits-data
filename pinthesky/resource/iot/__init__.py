@@ -42,6 +42,10 @@ def invoke(iot_data, connections, sessions):
         })
 
     cons = Repository.batch_read(request.account_id(), reads=reads)
+    found = dict([(item['id'], None) for item in reads])
+    for con in cons:
+        found[con['connectionId']] = con
+    cons = list(found.values())
     connection = cons[-1]
 
     if connection is None or not connection['authorized']:
