@@ -41,20 +41,23 @@ def invoke(iot_data, connections, sessions):
             'id': connection_id,
         })
 
-    cons = Repository.batch_read(request.account_id(), reads=reads)
-    found = dict([(item['id'], None) for item in reads])
-    for con in cons:
-        found[con['connectionId']] = con
-    cons = list(found.values())
-    connection = cons[-1]
-
-    if connection is None or not connection['authorized']:
+    def post_access_denied(conId):
         payload['statusCode'] = 401
         payload['error'] = {
             'code': 'AccessDenied',
-            'message': f'Connection {request.request_context("connectionId")} is not authorized',
+            'message': f'Connection {conId} is not authorized',
         }
         return post_to_connection()
+
+    cons = Repository.batch_read(request.account_id(), reads=reads)
+    for con in cons:
+        if not con['authorized']:
+            return post_access_denied(con['connectionId'])
+        if con['connectionId'] == connection_id:
+            connection = con
+
+    if connection is None:
+        return post_access_denied(request.request_context('connectionId'))
 
     def validate_input(field, obj, force=False):
         if force or field not in obj:
