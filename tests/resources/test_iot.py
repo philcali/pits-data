@@ -1,5 +1,7 @@
 import boto3
 import json
+import time
+from math import floor
 from ophis.globals import app_context
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -197,11 +199,22 @@ def test_invoke_non_session(iot):
 
 def test_invoke_start_session(iot):
     connectionId = str(uuid4())
+    otherConnectionId = str(uuid4())
     connections = app_context.resolve()['connections']
     connections.create(
         '123456789012',
         item={
             'connectionId': connectionId,
+            'expiresIn': floor(time.time()) + 60 * 1000,
+            'authorized': True,
+        }
+    )
+    connections.create(
+        '123456789012',
+        item={
+            'connectionId': otherConnectionId,
+            'managerId': connectionId,
+            'expiresIn': floor(time.time()) + 60 * 1000,
             'authorized': True,
         }
     )
@@ -224,6 +237,7 @@ def test_invoke_start_session(iot):
     with patch.object(boto3, 'client', return_value=management) as mock_client:
         iot(routeKey="invoke", connectionId=connectionId, body={
             'payload': {
+                'connectionId': otherConnectionId,
                 'invokeId': 'abc-123',
                 'camera': 'PitsCamera1',
                 'event': {
@@ -240,11 +254,11 @@ def test_invoke_start_session(iot):
     session = sessions.get(
         '123456789012',
         'Connections',
-        connectionId,
+        otherConnectionId,
         item_id='abc-123'
     )
     assert session['invokeId'] == 'abc-123'
-    assert session['connectionId'] == connectionId
+    assert session['connectionId'] == otherConnectionId
     assert session['camera'] == 'PitsCamera1'
 
 

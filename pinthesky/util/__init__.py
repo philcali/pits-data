@@ -36,7 +36,7 @@ class ManagementWrapper:
             endpoint_url=f'https://{self.connection_url()}',
         )
 
-    def publish(self, iot_data, thing_name, event, invoke_id=None):
+    def publish(self, iot_data, thing_name, event, invoke_id=None, manager_id=None):
         session_id = invoke_id if invoke_id is not None else str(uuid4())
         iot_data.publish(
             topic=f'pinthesky/events/{thing_name}/input',
@@ -47,6 +47,7 @@ class ManagementWrapper:
                     **event.get('session', {}),
                     'connection': {
                         'id': request.request_context('connectionId'),
+                        'manager_id': manager_id,
                         'invoke_id': session_id
                     }
                 }
