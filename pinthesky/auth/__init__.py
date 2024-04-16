@@ -75,7 +75,9 @@ class JWTAuthorizer:
 def user_jwt(event, context):
     set_stream_logger('pinthesky', level=os.getenv("LOG_LEVEL", "INFO"))
     connectionId = event['requestContext']['connectionId']
-    token = event['headers'].get('Authorization', None)
+    token = event['headers'].get(
+        'Authorization',
+        event['queryStringParameters'].get('Authorization'))
     if token is None:
         logger.info('Event did not contain an Authorization header.')
         return JWTAuthorizer.generate_policy(connectionId, 'Allow', event['methodArn'])

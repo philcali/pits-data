@@ -21,7 +21,10 @@ def connect(connections):
             }
         }
 
-    manager_id = request.headers.get('ManagerId', None)
+    manager_id = request.headers.get(
+        'ManagerId',
+        request.queryparams.get('ManagerId', None),
+    )
     connection_id = request.request_context('connectionId')
     expiresIn = {}
     if 'exp' in request.authorizer():

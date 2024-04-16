@@ -36,6 +36,8 @@ def test_no_header():
         'requestContext': {
             'connectionId': 'abc-123',
         },
+        'queryStringParameters': {
+        },
         'methodArn': '$connect',
     }, None)
     assert policy == {
@@ -61,10 +63,12 @@ def test_fail_key_retrieval(requests_mock):
     policy = user_jwt({
         'headers': {
             'Content-Length': 0,
-            'Authorization': FAKE_TOKEN,
         },
         'requestContext': {
             'connectionId': 'abc-123',
+        },
+        'queryStringParameters': {
+            'Authorization': FAKE_TOKEN,
         },
         'methodArn': '$connect',
     }, None)
@@ -106,6 +110,8 @@ def test_fail_invalid_key(requests_mock):
         },
         'requestContext': {
             'connectionId': 'abc-123',
+        },
+        'queryStringParameters': {
         },
         'methodArn': '$connect',
     }, None)
@@ -149,6 +155,8 @@ def test_fail_invalid_signature(requests_mock):
         'requestContext': {
             'connectionId': 'abc-123',
         },
+        'queryStringParameters': {
+        },
         'methodArn': '$connect',
     }, None)
     assert policy == {
@@ -178,6 +186,8 @@ def test_fail_expired(requests_mock):
         },
         'requestContext': {
             'connectionId': 'abc-123',
+        },
+        'queryStringParameters': {
         },
         'methodArn': '$connect',
     }, None)
@@ -211,6 +221,8 @@ def test_failed_invalid_audience(requests_mock):
         'requestContext': {
             'connectionId': 'abc-123',
         },
+        'queryStringParameters': {
+        },
         'methodArn': '$connect',
     }, None)
     assert policy == {
@@ -242,6 +254,8 @@ def test_allow(requests_mock):
         },
         'requestContext': {
             'connectionId': 'abc-123',
+        },
+        'queryStringParameters': {
         },
         'methodArn': '$connect',
     }, None)
