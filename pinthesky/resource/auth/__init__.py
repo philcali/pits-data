@@ -22,7 +22,7 @@ def login(connections, data_tokens):
     )
     payload = {'statusCode': 200}
 
-    if 'managerId' in input:
+    if input.get('managerId', None) is not None:
         manager = connections.get(
             request.account_id(),
             item_id=input['managerId'],
@@ -110,7 +110,7 @@ def login(connections, data_tokens):
         }
     ]
 
-    if 'managerId' in input:
+    if input.get('managerId', None) is not None:
         updates.append({
             'repository': connections,
             'parent_ids': ['Manager', input['managerId']],
