@@ -44,7 +44,10 @@ class ManagementWrapper:
                 'name': event['name'],
                 'context': {
                     **event.get('context', {}),
-                    **event.get('session', {}),
+                    'session': event.get('session', {
+                        'start': False,
+                        'stop': False,
+                    }),
                     'connection': {
                         'id': request.request_context('connectionId'),
                         'manager_id': manager_id,
