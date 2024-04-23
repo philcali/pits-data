@@ -37,6 +37,7 @@ def connect(connections):
             'manager': manager_id is None,
             'authorized': 'sub' in request.authorizer(),
             'claims': request.authorizer(),
+            'managementEndpoint': f'https://{management.connection_url()}',
             **expiresIn,
         })
 
