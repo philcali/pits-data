@@ -51,6 +51,7 @@ class ManagementWrapper:
                     'connection': {
                         'id': request.request_context('connectionId'),
                         'manager_id': manager_id,
+                        'management_endpoint': f'https://{self.connection_url()}',
                         'invoke_id': session_id
                     }
                 }
