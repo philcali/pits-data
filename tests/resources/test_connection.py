@@ -117,3 +117,92 @@ def test_disconnect_session(connections):
         connections(routeKey="$disconnect", connectionId="abc-123")
 
     mock_client.assert_called_once()
+
+
+def test_status_not_found(connections):
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == "not-found"
+        assert Data.decode('utf-8') == json.dumps({
+            'response': {
+                'action': 'status',
+                'statusCode': 404,
+                'error': {
+                    'code': 'ResourceNotFound',
+                    'message': 'The connection not-found was not found'
+                },
+                'requestId': 'id',
+            }
+        })
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        connections(routeKey="status", connectionId="not-found", body={
+        })
+
+    mock_client.assert_called_once()
+
+
+def test_status_not_authorized(connections):
+
+    connectionDb = app_context.resolve()['connections']
+    connectionDb.create(
+        connections.account_id(),
+        item={
+            'connectionId': 'not-authorized'
+        }
+    )
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == "not-authorized"
+        assert Data.decode('utf-8') == json.dumps({
+            'response': {
+                'action': 'status',
+                'statusCode': 401,
+                'error': {
+                    'code': 'Unauthorized',
+                    'message': 'The connection not-authorized is not authorized'
+                },
+                'requestId': 'id',
+            }
+        })
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        connections(routeKey="status", connectionId="not-authorized", body={
+        })
+
+    mock_client.assert_called_once()
+
+
+def test_status_happy_path(connections):
+
+    connectionDb = app_context.resolve()['connections']
+    connection = connectionDb.create(
+        connections.account_id(),
+        item={
+            'connectionId': 'happy-path',
+            'authorized': True,
+        }
+    )
+
+    def post_to_connection(ConnectionId, Data):
+        assert ConnectionId == "happy-path"
+        assert json.loads(Data.decode('utf-8')) == {
+            'response': {
+                'action': 'status',
+                'statusCode': 200,
+                'body': connection,
+                'requestId': 'id',
+            }
+        }
+
+    management = MagicMock()
+    management.post_to_connection = post_to_connection
+    with patch.object(boto3, 'client', return_value=management) as mock_client:
+        connections(routeKey="status", connectionId="happy-path", body={
+        })
+
+    mock_client.assert_called_once()

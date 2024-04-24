@@ -1,4 +1,5 @@
 import logging
+import json
 from ophis.globals import app_context, request, response
 from pinthesky.database import DataConnections
 from pinthesky.util import iterate_all_items
@@ -11,7 +12,6 @@ app_context.inject('connections', DataConnections())
 
 @api.routeKey('$connect')
 def connect(connections):
-
     protocol = request.headers.get('Sec-WebSocket-Protocol', None)
     if protocol is None or protocol not in ['manager', 'session']:
         response.status_code = 400
@@ -92,3 +92,34 @@ def disconnect(iot_data, connections, sessions):
             event=session['event'],
             invoke_id=session['invokeId'],
         )
+
+
+@api.routeKey('status')
+def status(connections):
+    connectionId = request.request_context('connectionId')
+    input = json.loads(request.body).get('payload', {'connectionId': connectionId})
+    connection = connections.get(
+        request.account_id(),
+        item_id=input.get('connectionId', connectionId),
+    )
+    payload = {'statusCode': 200}
+    if connection is None or (connectionId != connection['connectionId'] and connection.get('managerId') != connectionId):
+        payload['statusCode'] = 404
+        payload['error'] = {
+            'code': 'ResourceNotFound',
+            'message': f'The connection {input.get("connectionId", connectionId)} was not found'
+        }
+    elif not connection.get('authorized', False):
+        payload['statusCode'] = 401
+        payload['error'] = {
+            'code': 'Unauthorized',
+            'message': f'The connection {input.get("connectionId", connectionId)} is not authorized'
+        }
+    else:
+        payload['body'] = connection
+
+    @management.post()
+    def post_status():
+        return payload
+
+    return post_status()
