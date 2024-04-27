@@ -14,6 +14,24 @@ logger = logging.getLogger(__name__)
 
 @api.routeKey('login')
 def login(connections, data_tokens):
+    """
+    The "login" action will authorize the connection based an exchange token
+    created in the control plane. The token is single use, and tied to a
+    valid identity established from a user pool. A connection will send the
+    following payload:
+
+    {
+        "action": "login",
+        "payload": {
+            "tokenId": "<control plane token>",
+            "jwtId": "<session token from user pool>"
+        }
+    }
+
+    It is possible for a "session" connection to link to a "manager"
+    connection by providing the "managerId" in the payload.
+    """
+
     input = json.loads(request.body).get('payload', {})
     connection_id = input.get('managerId', request.request_context('connectionId'))
     connection = connections.get(

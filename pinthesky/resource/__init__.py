@@ -10,6 +10,10 @@ for module in [inject, connection, iot, auth]:
 @api.routeKey('$default')
 @management.post()
 def default():
+    """
+    This fallback handler is used for connections to discover
+    available actions surfaced by the websocket server.
+    """
     routeKeys = []
     for filter in api.filters:
         if hasattr(filter, 'routeKey'):

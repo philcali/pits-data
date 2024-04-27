@@ -73,6 +73,18 @@ class JWTAuthorizer:
 
 
 def user_jwt(event, context):
+    """
+    Entrypoint for use as an Authorization handler. The handler will do the following:
+    1. Check if an Authorization header contains a JWT token
+    2. Check if the connection url contains an Authorization query parameter
+    3. Check that the Sec-Websocket-Protocol header is set
+
+    If provided, the handler will verify the token against a valid user pool,
+    and reject the connection if it is not. If not provided, then the handler
+    will allow it, however the client must engaged in the token exchange via
+    the "login" action, or it will subsequently disconnect the client after
+    a few minutes.
+    """
     set_stream_logger('pinthesky', level=os.getenv("LOG_LEVEL", "INFO"))
     connectionId = event['requestContext']['connectionId']
     token = event['headers'].get(
