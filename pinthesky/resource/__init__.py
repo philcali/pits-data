@@ -10,6 +10,12 @@ for module in [inject, connection, iot, auth]:
 @api.routeKey('$default')
 @management.post()
 def default():
+    routeKeys = []
+    for filter in api.filters:
+        if hasattr(filter, 'routeKey'):
+            route_key = getattr(filter, 'routeKey')
+            if "$" not in route_key:
+                routeKeys.append(route_key)
     return {
         'statusCode': 404,
         'error': {
@@ -17,10 +23,6 @@ def default():
             'message': 'Resource not found',
         },
         'body': {
-            'availableActions': [
-                'login',
-                'invoke',
-                'listSessions',
-            ]
+            'availableActions': routeKeys,
         },
     }
