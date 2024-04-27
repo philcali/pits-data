@@ -38,9 +38,10 @@ def test_default(connections):
                 },
                 'body': {
                     'availableActions': [
-                        'login',
+                        'status',
                         'invoke',
                         'listSessions',
+                        'login',
                     ]
                 },
                 'requestId': 'id',
