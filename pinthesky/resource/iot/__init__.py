@@ -21,6 +21,45 @@ app_context.inject(
 
 @api.routeKey('invoke')
 def invoke(iot_data, connections, sessions):
+    """
+    The "invoke" action is the main entrypoint for directly
+    interacting with a pits-device. There are two types of
+    interactions:
+
+    1. Non-session based
+    2. Session based
+
+    Many events like "health", "configuration", and "capture_image"
+    do not require a long lived session on the device. Other
+    events like "record" informs the pits-device daemon keep the
+    invocation alive for as long as the session is open.
+
+    For non-session events:
+    {
+        "action": "invoke",
+        "payload": {
+            "event": {
+                "name": "health
+            }
+        }
+    }
+
+    For session events:
+    {
+        "action": "invoke",
+        "payload": {
+            "event": {
+                "name": "record",
+                "session": {
+                    "start": true
+                }
+            }
+        }
+    }
+
+    Sessions can be closed by supplying the returned "invokeId" and "stop" flag
+    on a subsequent command.
+    """
     input = json.loads(request.body).get('payload', {})
     connection_id = input.get('connectionId', request.request_context('connectionId'))
     payload = {'statusCode': 200}
@@ -123,6 +162,20 @@ def invoke(iot_data, connections, sessions):
 
 @api.routeKey("listSessions")
 def list_sessions(connections, sessions):
+    """
+    The "listSessions" action allows a connection to discover all
+    active invocation sessions initiated by the connection directly
+    or indirectly through an associated "session" connection.
+    Invoke with:
+
+    {
+        "action": "listSessions"
+    }
+
+    Control the number of items returned with "limit" and paginate
+    with "nextToken". A "manager" connection can list its "session"
+    invokcations with "connectionId". 
+    """
     payload = {'statusCode': 200}
 
     @management.post()
