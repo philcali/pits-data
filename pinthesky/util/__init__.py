@@ -5,6 +5,7 @@ import os
 from botocore.client import ClientError
 from ophis.database import QueryParams
 from ophis.globals import request
+from ophis.router import RouterEncoder
 from uuid import uuid4
 
 
@@ -91,7 +92,7 @@ class ManagementWrapper:
 
                 management.post_to_connection(
                     ConnectionId=conId,
-                    Data=json.dumps({'response': template}).encode('utf-8'),
+                    Data=json.dumps({'response': template}, cls=RouterEncoder).encode('utf-8'),
                 )
 
             return wrapper
