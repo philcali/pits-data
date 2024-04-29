@@ -145,6 +145,7 @@ def invoke(iot_data, connections, sessions):
         event=input['event'],
         invoke_id=invoke_id,
         manager_id=connection.get('managerId', None),
+        connection_id=connection['connectionId'],
     )
 
     if session.get('stop', False):
