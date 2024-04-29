@@ -120,7 +120,7 @@ def login(connections, data_tokens):
                 'connectionId': connection['connectionId'],
                 'createTime': connection['createTime'],
                 'managerId': input.get('managerId', None),
-                'manager': 'managerId' not in input,
+                'manager': input.get('managerId', None) is None,
                 'authorized': True,
                 'claims': claims,
                 'expiresIn': claims['exp'],
