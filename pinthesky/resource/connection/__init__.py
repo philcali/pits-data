@@ -100,11 +100,16 @@ def disconnect(iot_data, connections, sessions):
     ]
     for session in iterate_all_items(sessions, *args):
         sessions.delete(*args, item_id=session['invokeId'])
+        invoke_session = session['event'].get('session', {
+            'start': False,
+            'stop': True,
+        })
         management.publish(
             iot_data=iot_data,
             thing_name=session['camera'],
-            event=session['event'],
+            event={**session['event'], 'session': invoke_session},
             invoke_id=session['invokeId'],
+            connection_id=session['connectionId'],
         )
 
 
