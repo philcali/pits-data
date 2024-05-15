@@ -107,8 +107,16 @@ def disconnect(iot_data, connections, sessions):
         management.publish(
             iot_data=iot_data,
             thing_name=session['camera'],
-            event={**session['event'], 'session': invoke_session},
+            event={
+                **session['event'],
+                'session': {
+                    **invoke_session,
+                    'start': False,
+                    'stop': True,
+                }
+            },
             invoke_id=session['invokeId'],
+            manager_id=connection.get('managerId', None),
             connection_id=session['connectionId'],
         )
 
